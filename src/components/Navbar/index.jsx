@@ -119,10 +119,11 @@ function NavbarComponent({setCategory}) {
                     <Nav>
                         {['beranda', 'hiburan', 'gaya hidup', 'olahraga', 'nasional', 'internasional', 'ekonomi', 'teknologi'].map((category, index) => (
                         <Nav.Link
+                            as={Link}
+                            to={`/`}
                             key={index}
-                            style={handelstyle(category)} // Bandingkan dengan kategori langsung
+                            style={handelstyle(category)}
                             onClick={() => {
-                                console.log(`Setting category di navbar to: ${category}`);
                                 setCategory(category);
                             }}
                         >

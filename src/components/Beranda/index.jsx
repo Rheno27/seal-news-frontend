@@ -1,4 +1,3 @@
-import { Link  } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { Container, Row, Col, Card, Button, Pagination } from 'react-bootstrap'
 import { getBeritaHiburan, getBeritaGayaHidup, getBeritaOlahraga, getBeritaNasional, getBeritaInternasional, getBeritaEkonomi, getBeritaTeknologi, getBeritaTerbaru } from '../../services/berita'
@@ -6,7 +5,6 @@ import { useQuery } from '@tanstack/react-query';
 
 function Beranda({ newCategory }) {
     const navigate = useNavigate()
-    console.log("ini newCategory di beranda", newCategory);
 
     const fetchData = async () => {
         let fetchedData;
@@ -52,7 +50,6 @@ function Beranda({ newCategory }) {
         if (!dateString) return "Tanggal tidak tersedia";
         const date = new Date(dateString);
         if (isNaN(date.getTime())) {
-            console.error("Invalid date value:", dateString);
             return "Tanggal tidak valid";
         }
         const options = { day: 'numeric', month: 'long', year: 'numeric' };
@@ -88,9 +85,9 @@ function Beranda({ newCategory }) {
     let displayedData = null;
     if (data && data.posts) {
         if (newCategory === 'beranda') {
-            displayedData = data.posts[0]; // Data pertama sebagai headline
+            displayedData = data.posts[0];
         } else {
-            displayedData = getRandomData(data.posts); // Data acak untuk kategori lain
+            displayedData = getRandomData(data.posts);
         }
     }
 
@@ -114,11 +111,20 @@ function Beranda({ newCategory }) {
         params.set('thumbnail', displayedData?.thumbnail);
         params.set('category', newCategory);
     
-        // Menggunakan title sebagai ID dalam URL path
         navigate(`/detail?${params.toString()}`);
     };
-    
-    
+
+    // Handler untuk klik pada Berita Populer
+    const handleArticleClick = (article) => {
+        if (!article) return;
+        const params = new URLSearchParams();
+        params.set('title', article?.title);
+        params.set('pubDate', article?.pubDate);
+        params.set('description', article?.description);
+        params.set('thumbnail', article?.thumbnail);
+        params.set('category', newCategory); 
+        navigate(`/detail?${params.toString()}`);
+    };
 
     if (isLoading) {
         return <p>Loading...</p>;
@@ -155,7 +161,7 @@ function Beranda({ newCategory }) {
                     </p>
                     <Button
                         variant="primary"
-                        onClick={handleDetailClick}  // Menggunakan fungsi untuk navigasi dengan query params
+                        onClick={handleDetailClick}
                     >
                         Baca Selengkapnya
                     </Button>
@@ -207,14 +213,15 @@ function Beranda({ newCategory }) {
                     Berita Terpopuler
                 </h3>
                 <Row>
-                    {displayedPopular.length > 0 ? (
+                    {displayedPopular?.length > 0 ? (
                         displayedPopular.map((article, index) => {
                             const thumbnail = article?.thumbnail || '/default-thumbnail.jpg'; 
                             const title = article?.title || 'No title available';
                             const pubDate = article?.pubDate ? convertDate(article.pubDate) : 'No date available'; 
+
                             return (
                                 <Col md={4} key={index}>
-                                    <Card>
+                                    <Card onClick={() => handleArticleClick(article)} style={{ cursor: 'pointer' }}>
                                         <Row className="g-0 align-items-center">
                                             <Col md={4}>
                                                 <Card.Img
@@ -247,7 +254,7 @@ function Beranda({ newCategory }) {
                 </Row>
             </Container>
 
-            {/* Rekomendasi Untuk Anda */}
+            {/* Rekomendasi*/}
             <Container>
                 <div
                     style={{
@@ -301,13 +308,13 @@ function Beranda({ newCategory }) {
                 </div>
 
                 <Row xs={1} md={4} className="g-4">
-                    {displayedRecommendations.length > 0 ? (
+                    {displayedRecommendations?.length > 0 ? (
                         displayedRecommendations.map((article, idx) => {
-                            // Periksa apakah artikel memiliki properti thumbnail, title, dan pubDate
-                            const thumbnail = article?.thumbnail || '/default-thumbnail.jpg'; // Gambar default jika tidak ada thumbnail
-                            const title = article?.title || 'No title available'; // Judul default jika tidak ada title
-                            const pubDate = article?.pubDate ? convertDate(article.pubDate) : 'No date available'; // Tanggal default jika tidak ada
-                            
+                            // Periksa properti artikel
+                            const thumbnail = article?.thumbnail || '/default-thumbnail.jpg';
+                            const title = article?.title || 'No title available';
+                            const pubDate = article?.pubDate ? convertDate(article.pubDate) : 'No date available';
+
                             return (
                                 <Col key={idx}>
                                     <Card
@@ -317,7 +324,9 @@ function Beranda({ newCategory }) {
                                             marginTop: '20px',
                                             marginLeft: '20px',
                                             marginRight: '20px',
+                                            cursor: 'pointer',
                                         }}
+                                        onClick={() => handleArticleClick(article)}
                                     >
                                         <Card.Img
                                             variant="top"

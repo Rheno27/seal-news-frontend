@@ -2,7 +2,7 @@ import { createLazyFileRoute } from '@tanstack/react-router'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import Detail from '../../components/Detail'
-import { useNavigate, useSearchParams, useParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 
 export const Route = createLazyFileRoute('/detail/')({
@@ -21,9 +21,8 @@ function RouteComponent() {
   const categoryParam = searchParams.get('category') || 'beranda'
 
   useEffect(() => {
-    console.log('Title yang diambil dari URL di detail title:', title)
     if (!title) {
-      navigate('/') // Jika title tidak ada di query, kembali ke halaman utama
+      navigate('/')
     }
   }, [title, navigate])
 
@@ -35,7 +34,6 @@ function RouteComponent() {
     category: categoryParam === 'beranda' ? 'terbaru' : categoryParam,
   }
 
-  console.log('newsDetail yang diterima di detail title:', newsDetail)
   
   return (
     <>
