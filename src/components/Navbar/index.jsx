@@ -3,7 +3,7 @@ import { useLocation, Link } from '@tanstack/react-router';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import logo from '../../assets/logo.png';
+import logo from '../../assets/Logo.png';
 import logoScroll from '../../assets/Logoputih.png';
 
 function NavbarComponent({setCategory}) {

@@ -1,5 +1,5 @@
 import { Container, Row, Col } from 'react-bootstrap';
-import logo from '../../assets/logoputih.png'
+import logo from '../../assets/Logoputih.png'
 
 function Footer() {
     return (
