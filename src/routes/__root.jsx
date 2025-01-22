@@ -8,9 +8,7 @@ import Footer from '../components/Footer';
 
 export const Route = createRootRoute({
     component: () => {
-        const [category, setCategory] = useState('hiburan');
-        console.log('Current category in Route:', category);
-    
+        const [category, setCategory] = useState('hiburan');    
         return (
             <>
             <Navbar setCategory={setCategory} />

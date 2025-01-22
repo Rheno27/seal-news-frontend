@@ -11,37 +11,61 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as DetailImport } from './routes/detail'
 
 // Create/Update Routes
+
+const DetailRoute = DetailImport.update({
+  id: '/detail',
+  path: '/detail',
+  getParentRoute: () => rootRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {}
+  interface FileRoutesByPath {
+    '/detail': {
+      id: '/detail'
+      path: '/detail'
+      fullPath: '/detail'
+      preLoaderRoute: typeof DetailImport
+      parentRoute: typeof rootRoute
+    }
+  }
 }
 
 // Create and export the route tree
 
-export interface FileRoutesByFullPath {}
+export interface FileRoutesByFullPath {
+  '/detail': typeof DetailRoute
+}
 
-export interface FileRoutesByTo {}
+export interface FileRoutesByTo {
+  '/detail': typeof DetailRoute
+}
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
+  '/detail': typeof DetailRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: never
+  fullPaths: '/detail'
   fileRoutesByTo: FileRoutesByTo
-  to: never
-  id: '__root__'
+  to: '/detail'
+  id: '__root__' | '/detail'
   fileRoutesById: FileRoutesById
 }
 
-export interface RootRouteChildren {}
+export interface RootRouteChildren {
+  DetailRoute: typeof DetailRoute
+}
 
-const rootRouteChildren: RootRouteChildren = {}
+const rootRouteChildren: RootRouteChildren = {
+  DetailRoute: DetailRoute,
+}
 
 export const routeTree = rootRoute
   ._addFileChildren(rootRouteChildren)
@@ -52,7 +76,12 @@ export const routeTree = rootRoute
   "routes": {
     "__root__": {
       "filePath": "__root.jsx",
-      "children": []
+      "children": [
+        "/detail"
+      ]
+    },
+    "/detail": {
+      "filePath": "detail.jsx"
     }
   }
 }

@@ -26,35 +26,37 @@ function NavbarComponent({setCategory}) {
     }, []);
 
     useEffect(() => {
-        const pathToLinkMap = {
-            '/': 1,
-            '/terbaru': 2,
-            '/hiburan': 3,
-            '/gaya-hidup': 4,
-            '/olahraga': 5,
-            '/nasional': 6,
-            '/internasional': 7,
+        const pathToCategory = {
+            '/': 'beranda',
+            '/hiburan': 'hiburan',
+            '/gaya hidup': 'gaya hidup',
+            '/olahraga': 'olahraga',
+            '/nasional': 'nasional',
+            '/internasional': 'internasional',
+            '/ekonomi': 'ekonomi',
+            '/teknologi': 'teknologi',
         };
-        setActiveLink(pathToLinkMap[location.pathname] || 0);
+        setActiveLink(pathToCategory[location.pathname] || ''); // Simpan kategori
     }, [location.pathname]);
-
-    const handelstyle = (link) => {
+    
+    const handelstyle = (category) => {
         if (scroll) {
             return {
-                color: activeLink === link ? 'white' : 'white',
+                color: activeLink === category ? 'white' : 'white',
                 fontSize: '14px',
                 marginRight: '10px',
-                fontWeight: activeLink === link ? 'bold' : 'normal',
-            }
+                fontWeight: activeLink === category ? 'bold' : 'normal',
+            };
         } else {
             return {
-                color: activeLink === link ? '#0099FF' : 'gray',
+                color: activeLink === category ? '#0099FF' : 'gray',
                 fontSize: '14px',
                 marginRight: '10px',
-                fontWeight: activeLink === link ? 'bold' : 'normal',
-            }
+                fontWeight: activeLink === category ? 'bold' : 'normal',
+            };
         }
-    }
+    };
+    
 
     return (
         <Navbar 
@@ -81,7 +83,7 @@ function NavbarComponent({setCategory}) {
                         marginRight: '10px',
                     }} />
                 <Navbar.Brand 
-                    as={Link} to="/beranda"
+                    as={Link} to="/"
                     style={{ 
                         fontSize: '14px',
                         fontWeight: 'bold',
@@ -100,7 +102,7 @@ function NavbarComponent({setCategory}) {
                         marginRight: '10px',
                     }} />
                     <Navbar.Brand 
-                        as={Link} to="/beranda"
+                        as={Link} to="/"
                         style={{ 
                             fontSize: '14px',
                             fontWeight: 'bold',
@@ -115,15 +117,18 @@ function NavbarComponent({setCategory}) {
                 <Nav className="me-auto">
                 </Nav>
                     <Nav>
-                    {['beranda', 'hiburan', 'gaya-hidup', 'olahraga', 'nasional', 'internasional'].map((category, index) => (
+                        {['beranda', 'hiburan', 'gaya hidup', 'olahraga', 'nasional', 'internasional', 'ekonomi', 'teknologi'].map((category, index) => (
                         <Nav.Link
-                        key={index}
-                        style={handelstyle(index + 1)}
-                        onClick={() =>{ 
-                            console.log(`Setting category to: ${category}`)
-                            setCategory(category)}}
+                            key={index}
+                            as={Link} 
+                            to={`/${category === 'beranda' ? '' : category}`}
+                            style={handelstyle(category)} // Bandingkan dengan kategori langsung
+                            onClick={() => {
+                                console.log(`Setting category to: ${category}`);
+                                setCategory(category);
+                            }}
                         >
-                        {category.charAt(0).toUpperCase() + category.slice(1)}
+                            {category.charAt(0).toUpperCase() + category.slice(1)}
                         </Nav.Link>
                     ))}
                     </Nav>
