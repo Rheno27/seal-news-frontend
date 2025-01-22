@@ -8,28 +8,47 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as DetailImport } from './routes/detail'
+
+// Create Virtual Routes
+
+const IndexLazyImport = createFileRoute('/')()
+const DetailIndexLazyImport = createFileRoute('/detail/')()
 
 // Create/Update Routes
 
-const DetailRoute = DetailImport.update({
-  id: '/detail',
-  path: '/detail',
+const IndexLazyRoute = IndexLazyImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRoute,
-} as any)
+} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+
+const DetailIndexLazyRoute = DetailIndexLazyImport.update({
+  id: '/detail/',
+  path: '/detail/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/detail/index.lazy').then((d) => d.Route))
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/detail': {
-      id: '/detail'
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/detail/': {
+      id: '/detail/'
       path: '/detail'
       fullPath: '/detail'
-      preLoaderRoute: typeof DetailImport
+      preLoaderRoute: typeof DetailIndexLazyImport
       parentRoute: typeof rootRoute
     }
   }
@@ -38,33 +57,38 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '/detail': typeof DetailRoute
+  '/': typeof IndexLazyRoute
+  '/detail': typeof DetailIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
-  '/detail': typeof DetailRoute
+  '/': typeof IndexLazyRoute
+  '/detail': typeof DetailIndexLazyRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/detail': typeof DetailRoute
+  '/': typeof IndexLazyRoute
+  '/detail/': typeof DetailIndexLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/detail'
+  fullPaths: '/' | '/detail'
   fileRoutesByTo: FileRoutesByTo
-  to: '/detail'
-  id: '__root__' | '/detail'
+  to: '/' | '/detail'
+  id: '__root__' | '/' | '/detail/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  DetailRoute: typeof DetailRoute
+  IndexLazyRoute: typeof IndexLazyRoute
+  DetailIndexLazyRoute: typeof DetailIndexLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  DetailRoute: DetailRoute,
+  IndexLazyRoute: IndexLazyRoute,
+  DetailIndexLazyRoute: DetailIndexLazyRoute,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +101,15 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.jsx",
       "children": [
-        "/detail"
+        "/",
+        "/detail/"
       ]
     },
-    "/detail": {
-      "filePath": "detail.jsx"
+    "/": {
+      "filePath": "index.lazy.jsx"
+    },
+    "/detail/": {
+      "filePath": "detail/index.lazy.jsx"
     }
   }
 }

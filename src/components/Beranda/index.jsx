@@ -1,64 +1,72 @@
-import { Link } from 'react-router-dom'
+import { Link  } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Container, Row, Col, Card, Button, Pagination } from 'react-bootstrap'
-import { useState } from 'react';
 import { getBeritaHiburan, getBeritaGayaHidup, getBeritaOlahraga, getBeritaNasional, getBeritaInternasional, getBeritaEkonomi, getBeritaTeknologi, getBeritaTerbaru } from '../../services/berita'
 import { useQuery } from '@tanstack/react-query';
-function Beranda({ category }) {
-    const [popularArticles, setPopularArticles] = useState([]);
+
+function Beranda({ newCategory }) {
+    const navigate = useNavigate()
+    console.log("ini newCategory di beranda", newCategory);
 
     const fetchData = async () => {
         let fetchedData;
-        switch (category) {
+        switch (newCategory) {
             case 'beranda':
                 fetchedData = await getBeritaTerbaru();
-            break;
+                break;
             case 'hiburan':
                 fetchedData = await getBeritaHiburan();
-            break;
+                break;
             case 'gaya hidup':
                 fetchedData = await getBeritaGayaHidup();
-            break;
+                break;
             case 'olahraga':
                 fetchedData = await getBeritaOlahraga();
-            break;
+                break;
             case 'nasional':
                 fetchedData = await getBeritaNasional();
-            break;
+                break;
             case 'internasional':
                 fetchedData = await getBeritaInternasional();
-            break;
+                break;
             case 'ekonomi':
                 fetchedData = await getBeritaEkonomi();
-            break;
+                break;
             case 'teknologi':
                 fetchedData = await getBeritaTeknologi();
-            break;
+                break;
+            default:
+                fetchedData = await getBeritaTerbaru();
+                break;
         }
         return fetchedData;
     };
 
-    // Menggunakan useQuery dengan format objek
     const { data, isLoading, isError, error } = useQuery({
-        queryKey: ['berita', category],
+        queryKey: ['berita', newCategory],
         queryFn: fetchData,
         refetchOnWindowFocus: false,
     });
-    
-    // Convert tanggal ke bahasa indonesia
+
     const convertDate = (dateString) => {
+        if (!dateString) return "Tanggal tidak tersedia";
         const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+            console.error("Invalid date value:", dateString);
+            return "Tanggal tidak valid";
+        }
         const options = { day: 'numeric', month: 'long', year: 'numeric' };
         return new Intl.DateTimeFormat('id-ID', options).format(date);
     };
-    
-    // random 1 berita untuk bagian headline
+
+    // Fungsi untuk mendapatkan 1 berita acak (headline)
     const getRandomData = (posts) => {
         if (!posts || posts.length < 1) return null;
         const randomIndex = Math.floor(Math.random() * posts.length);
         return posts[randomIndex];
     };
 
-    // random 3 berita untuk bagian populer
+    // Fungsi untuk mendapatkan 3 berita acak (populer)
     const getRandomArticles = (posts) => {
         if (!posts || posts.length < 3) return [];
         const randomIndexes = Array.from({ length: 3 }, () =>
@@ -67,7 +75,7 @@ function Beranda({ category }) {
         return randomIndexes.map((index) => posts[index]);
     };
 
-    //random 8 berita untuk bagian rekomendasi
+    // Fungsi untuk mendapatkan 8 berita acak (rekomendasi)
     const getRandomRecommendations = (posts) => {
         if (!posts || posts.length < 8) return [];
         const randomIndexes = Array.from({ length: 8 }, () =>
@@ -79,24 +87,38 @@ function Beranda({ category }) {
     // Validasi keberadaan data dan posts
     let displayedData = null;
     if (data && data.posts) {
-        if (category === 'beranda') {
-            displayedData = data.posts[0]; // Data pertama
+        if (newCategory === 'beranda') {
+            displayedData = data.posts[0]; // Data pertama sebagai headline
         } else {
-            displayedData = getRandomData(data.posts); // Data acak
+            displayedData = getRandomData(data.posts); // Data acak untuk kategori lain
         }
     }
 
-    //berita populer
+    // Berita Populer
     let displayedPopular = null;
     if (data && data.posts) {
         displayedPopular = getRandomArticles(data.posts);
     }
 
-    //berita rekomendasi
+    // Berita Rekomendasi
     let displayedRecommendations = null;
     if (data && data.posts) {
         displayedRecommendations = getRandomRecommendations(data.posts);
     }
+
+    const handleDetailClick = () => {
+        const params = new URLSearchParams();
+        params.set('title', displayedData?.title);
+        params.set('pubDate', displayedData?.pubDate);
+        params.set('description', displayedData?.description);
+        params.set('thumbnail', displayedData?.thumbnail);
+        params.set('category', newCategory);
+    
+        // Menggunakan title sebagai ID dalam URL path
+        navigate(`/detail?${params.toString()}`);
+    };
+    
+    
 
     if (isLoading) {
         return <p>Loading...</p>;
@@ -115,75 +137,59 @@ function Beranda({ category }) {
             {/* Headline */}
             <Container className="my-5">
                 <Row
-                style={{
+                    style={{
                     marginTop: '120px',
                     marginBottom: '80px',
-                }}
-                >
-                <Col
-                    md={5}
-                    style={{
-                    marginRight: '90px',
                     }}
                 >
-                    <p>Headline {category}</p>
-                    <h2>
-                        {displayedData?.title}
-                    </h2>
+                    <Col md={5} style={{ marginRight: '90px' }}>
+                    <p>Headline {newCategory}</p>
+                    <h2>{displayedData?.title}</h2>
                     <br />
-                    <p
-                        style={{
-                            fontSize: '16px',
-                            color: 'gray',
-                        }}
-                    >
-                    {displayedData?.description}
+                    <p style={{ fontSize: '16px', color: 'gray' }}>
+                        {displayedData?.description}
                     </p>
-                    <p
-                        style={{
-                            fontSize: '16px',
-                            color: 'gray',
-                        }}
-                    >
-                    <i className="bi bi-calendar-event me-2"></i>
-                    <small>{convertDate(displayedData?.pubDate)}</small>
+                    <p style={{ fontSize: '16px', color: 'gray' }}>
+                        <i className="bi bi-calendar-event me-2"></i>
+                        <small>{convertDate(displayedData?.pubDate)}</small>
                     </p>
-                    <Button 
-                        as={Link} to={`/detail/${encodeURIComponent(displayedData?.title)}`}
+                    <Button
                         variant="primary"
-                        onClick={() => window.open(displayedData?.link, '_blank')}
-                    >Baca Selengkapnya</Button>
-                </Col>
-                <Col md={6}>
+                        onClick={handleDetailClick}  // Menggunakan fungsi untuk navigasi dengan query params
+                    >
+                        Baca Selengkapnya
+                    </Button>
+                    </Col>
+                    <Col md={6}>
                     <img
-                    src={displayedData?.thumbnail}
-                    alt="Headline"
-                    className="img-fluid"
-                    style={{
+                        src={displayedData?.thumbnail}
+                        alt="Headline"
+                        className="img-fluid"
+                        style={{
                         width: '100%',
                         height: 'auto',
                         borderRadius: '10px',
                         boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
-                    }}
+                        }}
                     />
-                </Col>
-                <Col
+                    </Col>
+                    <Col
                     md={12}
                     style={{
-                    marginTop: '40px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
+                        marginTop: '40px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                     }}
-                >
+                    >
                     <Pagination>
-                    <Pagination.Prev />
-                    <Pagination.Item>1</Pagination.Item>
-                    <Pagination.Ellipsis> dari </Pagination.Ellipsis>
-                    <Pagination.Item>5</Pagination.Item>
-                    <Pagination.Next />
+                        <Pagination.Prev />
+                        <Pagination.Item>1</Pagination.Item>
+                        <Pagination.Ellipsis> dari </Pagination.Ellipsis>
+                        <Pagination.Item>5</Pagination.Item>
+                        <Pagination.Next />
                     </Pagination>
-                </Col>
+                    </Col>
                 </Row>
             </Container>
 
@@ -196,46 +202,50 @@ function Beranda({ category }) {
                         marginBottom: '20px',
                         borderLeft: '4px solid #0099ff',
                         paddingLeft: '10px',
-                        
                     }}
                 >
                     Berita Terpopuler
                 </h3>
                 <Row>
                     {displayedPopular.length > 0 ? (
-                        displayedPopular.map((article, index) => (
-                            <Col md={4} key={index}>
-                                <Card>
-                                    <Row className="g-0 align-items-center">
-                                        <Col md={4}>
-                                            <Card.Img
-                                                src={article.thumbnail}
-                                                className="img-fluid"
-                                                style={{
-                                                    borderRadius: '5px',
-                                                    margin: '10px',
-                                                }}
-                                            />
-                                        </Col>
-                                        <Col md={8}>
-                                            <Card.Body>
-                                                <Card.Title style={{ fontSize: '14px' }}>
-                                                    {article.title}
-                                                </Card.Title>
-                                                <Card.Text style={{ fontSize: '12px' }}>
-                                                    <span style={{ color: '#0099ff' }}>{category}</span> - {convertDate(article.pubDate)}
-                                                </Card.Text>
-                                            </Card.Body>
-                                        </Col>
-                                    </Row>
-                                </Card>
-                            </Col>
-                        ))
+                        displayedPopular.map((article, index) => {
+                            const thumbnail = article?.thumbnail || '/default-thumbnail.jpg'; 
+                            const title = article?.title || 'No title available';
+                            const pubDate = article?.pubDate ? convertDate(article.pubDate) : 'No date available'; 
+                            return (
+                                <Col md={4} key={index}>
+                                    <Card>
+                                        <Row className="g-0 align-items-center">
+                                            <Col md={4}>
+                                                <Card.Img
+                                                    src={thumbnail}
+                                                    className="img-fluid"
+                                                    style={{
+                                                        borderRadius: '5px',
+                                                        margin: '10px',
+                                                    }}
+                                                />
+                                            </Col>
+                                            <Col md={8}>
+                                                <Card.Body>
+                                                    <Card.Title style={{ fontSize: '14px' }}>
+                                                        {title}
+                                                    </Card.Title>
+                                                    <Card.Text style={{ fontSize: '12px' }}>
+                                                        <span style={{ color: '#0099ff' }}>{newCategory}</span> - {pubDate}
+                                                    </Card.Text>
+                                                </Card.Body>
+                                            </Col>
+                                        </Row>
+                                    </Card>
+                                </Col>
+                            );
+                        })
                     ) : (
                         <p>Tidak ada artikel populer tersedia.</p>
                     )}
                 </Row>
-            </Container>;
+            </Container>
 
             {/* Rekomendasi Untuk Anda */}
             <Container>
@@ -291,43 +301,54 @@ function Beranda({ category }) {
                 </div>
 
                 <Row xs={1} md={4} className="g-4">
-                    {displayedRecommendations.map((article, idx) => (
-                        <Col key={idx}>
-                            <Card
-                                style={{
-                                    border: 'none',
-                                    marginBottom: '20px',
-                                    marginTop: '20px',
-                                    marginLeft: '20px',
-                                    marginRight: '20px',
-                                }}
-                            >
-                                <Card.Img
-                                    variant="top"
-                                    src={article.thumbnail}
-                                    style={{
-                                        borderRadius: '5px',
-                                    }}
-                                />
-                                <Card.Body>
-                                    <Card.Title
+                    {displayedRecommendations.length > 0 ? (
+                        displayedRecommendations.map((article, idx) => {
+                            // Periksa apakah artikel memiliki properti thumbnail, title, dan pubDate
+                            const thumbnail = article?.thumbnail || '/default-thumbnail.jpg'; // Gambar default jika tidak ada thumbnail
+                            const title = article?.title || 'No title available'; // Judul default jika tidak ada title
+                            const pubDate = article?.pubDate ? convertDate(article.pubDate) : 'No date available'; // Tanggal default jika tidak ada
+                            
+                            return (
+                                <Col key={idx}>
+                                    <Card
                                         style={{
-                                            fontSize: '16px',
-                                            color: 'black',
+                                            border: 'none',
+                                            marginBottom: '20px',
+                                            marginTop: '20px',
+                                            marginLeft: '20px',
+                                            marginRight: '20px',
                                         }}
                                     >
-                                        {article.title}
-                                    </Card.Title>
-                                    <Card.Text style={{ fontSize: '12px' }}>
-                                        <span style={{ color: '#0099ff' }}>{category}</span> - {convertDate(article.pubDate)}
-                                    </Card.Text>
-                                </Card.Body>
-                            </Card>
-                        </Col>
-                    ))}
+                                        <Card.Img
+                                            variant="top"
+                                            src={thumbnail}
+                                            style={{
+                                                borderRadius: '5px',
+                                            }}
+                                        />
+                                        <Card.Body>
+                                            <Card.Title
+                                                style={{
+                                                    fontSize: '16px',
+                                                    color: 'black',
+                                                }}
+                                            >
+                                                {title}
+                                            </Card.Title>
+                                            <Card.Text style={{ fontSize: '12px' }}>
+                                                <span style={{ color: '#0099ff' }}>{newCategory}</span> - {pubDate}
+                                            </Card.Text>
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+                            );
+                        })
+                    ) : (
+                        <p>Tidak ada artikel rekomendasi tersedia.</p>
+                    )}
                 </Row>
 
-                {/* Bagian Pagination */}
+                {/* Bagian Pagination (Desain Saja) */}
                 <Row className="mt-3">
                     <Col md={7}>
                         <p
@@ -360,6 +381,7 @@ function Beranda({ category }) {
                     </Col>
                 </Row>
             </Container>
+
         </>
     )
 }

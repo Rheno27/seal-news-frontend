@@ -51,35 +51,31 @@ function Footer() {
                                 <span 
                                     className="text-white mb-3" 
                                     style={{ cursor: 'pointer' }}
-                                    onClick={() => window.location.href = '/'}>Beranda</span>
+                                    >Beranda</span>
                                 <span 
                                     className="text-white mb-3" 
                                     style={{ cursor: 'pointer' }}
-                                    onClick={() => window.location.href = '/terbaru'}>Terbaru</span>
+                                    >Hiburan</span>
                                 <span 
                                     className="text-white mb-3" 
                                     style={{ cursor: 'pointer' }}
-                                    onClick={() => window.location.href = '/hiburan'}>Hiburan</span>
+                                    >Politik</span>
                                 <span 
                                     className="text-white mb-3" 
                                     style={{ cursor: 'pointer' }}
-                                    onClick={() => window.location.href = '/politik'}>Politik</span>
+                                    >Olahraga</span>
                                 <span 
                                     className="text-white mb-3" 
                                     style={{ cursor: 'pointer' }}
-                                    onClick={() => window.location.href = '/olahraga'}>Olahraga</span>
+                                    >Gaya Hidup</span>
                                 <span 
                                     className="text-white mb-3" 
                                     style={{ cursor: 'pointer' }}
-                                    onClick={() => window.location.href = '/gaya-hidup'}>Gaya Hidup</span>
+                                    >Nasional</span>
                                 <span 
                                     className="text-white mb-3" 
                                     style={{ cursor: 'pointer' }}
-                                    onClick={() => window.location.href = '/nasional'}>Nasional</span>
-                                <span 
-                                    className="text-white mb-3" 
-                                    style={{ cursor: 'pointer' }}
-                                    onClick={() => window.location.href = '/internasional'}>Internasional</span>
+                                    >Internasional</span>
                             </div>
                         </Col>
                         <Col md={2}>
