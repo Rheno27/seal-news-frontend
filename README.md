@@ -1,8 +1,18 @@
-# React + Vite
+# SEAL NEWS
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SEAL NEWS is a news web application built using **React** and **Vite**. This app provides the latest news from various categories with a responsive design and a fast development experience.
 
-Currently, two official plugins are available:
+## Key Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Displays the latest news from various categories
+- Fast development experience thanks to **Fast Refresh**
+- Responsive design that works on various devices
+
+## Technologies Used
+
+- **React**: A JavaScript library for building user interfaces
+- **Vite**: A fast build tool for modern web development
+- **React Router**: A library for routing in React applications
+- **Bootstrap**: A popular CSS framework for building responsive and mobile-first websites
+- **React Query**: A library for managing server state in React applications
+- **Vercel**: A cloud platform for building modern web applications
